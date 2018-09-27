@@ -94,6 +94,7 @@ architecture rtl of processor is
   
 --Señal para el PC
   signal PCres : std_logic_vector(31 downto 0);
+  signal extSigno : std_logic_vector(31 downto 0);   --Señal para la extension de signo del dato inmediato en el branch
 
 begin   
   u1 : alu port map (OpA => rd1AUX, OpB => aluMux , Control => aluControlAUX,
@@ -109,7 +110,33 @@ begin
                               ALUControl => AluControlAUX, RegWrite => RegWriteAUX, RegDst => RegDstAUX);
   
   --Implementamos el PC
-  if JumpAUX = '1' then
-    PCres <= IAdrr(31 downto 28) & IDataIn(25 downto 0) & "00";
+
+  with IDataIn(15) select												--Hacemos la extension de signo, utilizada en el branch y en instruciiones con dato inmediato  
+			extSigno <= "0000000000000000" & IDataIn(15 downto 0)  when '0',	     
+						"1111111111111111" & IDataIn(15 downto 0)  when others;
+
+  if JumpAUX = '1' then							-- Si hay un jump, la direccion es la dada por la instruccion
+    	PCres <= IAdrr(31 downto 28) & IDataIn(25 downto 0) & "00";
+
+  else if (branchAUX = '1') and (ZAUX = '1') then					--Si hay un branch,la direccion es la suma del PC + 4 con el dato dado
+	PCres <= (extSigno(29 downto 0) & "00") + (IAdrr + 4);
+  
+  else PCres <= IAdrr + 4;
+  end if;
+
+ --Implementamos el multiplexor del banco de registros
+
+  if RegDstAUX = '0' then
+	regMux <= IDataIn(20 downto 16);
+  else regMux <= IDataIn(15 downto 11);
+  end if;
+
+ --Implementamos el multiplexor de la ALU
+  
+  if ALUSrcAUX = '0' then
+	aluMux <= rd2AUX;
+  else if aluMux <= extSigno;
+  end if;
+
  
 end architecture;

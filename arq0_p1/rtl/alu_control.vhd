@@ -1,4 +1,4 @@
---------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
 -- Bloque de control para la ALU. Arq0 2018.
 -- Fecha última modificación:
 -- Autores: Lucía Rivas Molina y Daniel Santo-Tomás
