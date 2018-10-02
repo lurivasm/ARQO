@@ -80,7 +80,7 @@ architecture rtl of processor is
   signal aluMux : std_logic_vector(31 downto 0);  -- Salida del Multiplexor que determina que entra en op2 en la alu
   signal aluControlAUX : std_logic_vector(3 downto 0);  -- Señal auxiliar para la alu control
   signal aluOut :  std_logic_vector(31 downto 0); --Señal auxiliar para la salida de la alu
-  signal ZAUX : std_logic   --Señal auxiliar para la bandera Z
+  signal ZAUX : std_logic ;  --Señal auxiliar para la bandera Z
   
 --Señales para instanciar el banco de registros
   signal regMux : std_logic_vector(4 downto 0);  -- Salida del Multiplexor que determina qué entra en A3 en el banco de registros
@@ -90,10 +90,9 @@ architecture rtl of processor is
   
 --Señales para instanciar la unidad de control
   signal regWriteAUX, branchAUX, JumpAUX, MemToRegAUX, MemWriteAUX, MemReadAUX, AluSrcAUX, RegDstAUX : std_logic ;
-  signal AluControlAUX : std_logic(3 downto 0);
   
 --Señal para el PC
-  signal PCres : std_logic_vector(31 downto 0);
+  signal PCres,PCAUX : std_logic_vector(31 downto 0);
   signal extSigno : std_logic_vector(31 downto 0);   --Señal para la extension de signo del dato inmediato en el branch
 
 begin   
@@ -107,36 +106,73 @@ begin
   u3 : control_unit port map (OpCode => IDataIn(31 downto 26), Funct => IDataIn(5 downto 0),
                               Branch => branchAUX, Jump => JumpAUX, MemToReg => MemToRegAUX,
                               MemWrite => MemWriteAUX, MemRead => MemReadAUX, ALUSrc => AluSrcAUX,
-                              ALUControl => AluControlAUX, RegWrite => RegWriteAUX, RegDst => RegDstAUX);
+                              ALUControl => aluControlAUX, RegWrite => RegWriteAUX, RegDst => RegDstAUX);
   
-  --Implementamos el PC
+  --Implementamos el PC, con sus posibles salidas
 
   with IDataIn(15) select												--Hacemos la extension de signo, utilizada en el branch y en instruciiones con dato inmediato  
 			extSigno <= "0000000000000000" & IDataIn(15 downto 0)  when '0',	     
 						"1111111111111111" & IDataIn(15 downto 0)  when others;
 
-  if JumpAUX = '1' then							-- Si hay un jump, la direccion es la dada por la instruccion
-    	PCres <= IAdrr(31 downto 28) & IDataIn(25 downto 0) & "00";
+  process(JumpAUX,branchAUX,ZAUX)
+	begin
+  		if JumpAUX = '1' then							-- Si hay un jump, la direccion es la dada por la instruccion
+    			PCres <= PCAUX(31 downto 28) & IDataIn(25 downto 0) & "00";
 
-  else if (branchAUX = '1') and (ZAUX = '1') then					--Si hay un branch,la direccion es la suma del PC + 4 con el dato dado
-	PCres <= (extSigno(29 downto 0) & "00") + (IAdrr + 4);
+  		elsif (branchAUX = '1') and (ZAUX = '1') then					--Si hay un branch,la direccion es la suma del PC + 4 con el dato dado
+			PCres <= (extSigno(29 downto 0) & "00") + (PCAUX + 4);
   
-  else PCres <= IAdrr + 4;
-  end if;
+  		else PCres <= PCAUX + 4;
+  		end if;
+	end process;
+
+  process(Clk,Reset)
+	begin
+		if Reset = '1' then
+			PCAUX <= "00000000000000000000000000000000";
+		elsif rising_edge(Clk) then 
+			PCAUX <= PCres;
+		end if;
+	end process;
+
+  IAddr <= PCAUX;
+
+ --Implementamos las salidas para la memoria de datos
+ 
+ DAddr <= aluOut;
+ DRdEn <= MemReadAUX;
+ DWrEn <= MemWriteAUX;
+ DDataOut <= rd2AUX;
 
  --Implementamos el multiplexor del banco de registros
 
-  if RegDstAUX = '0' then
-	regMux <= IDataIn(20 downto 16);
-  else regMux <= IDataIn(15 downto 11);
-  end if;
+  process(RegDstAUX)
+	begin
+  		if RegDstAUX = '0' then
+			regMux <= IDataIn(20 downto 16);
+  		else regMux <= IDataIn(15 downto 11);
+  		end if;
+  	end process;
 
  --Implementamos el multiplexor de la ALU
   
-  if ALUSrcAUX = '0' then
-	aluMux <= rd2AUX;
-  else if aluMux <= extSigno;
-  end if;
-
+  process(ALUSrcAUX)
+	begin
+  		if ALUSrcAUX = '0' then
+			aluMux <= rd2AUX;
+ 		else aluMux <= extSigno;
+  		end if;
+	end process;
  
+ --Implementamos el multiplexor de los datos a escribir en el banco de registros
+ 
+ process(MemToRegAUX)
+	begin
+		if MemToRegAUX = '1' then
+			writedAUX <= DDataIn;
+		else writedAUX <= aluOut;
+		end if;
+	end process;
+
+
 end architecture;
