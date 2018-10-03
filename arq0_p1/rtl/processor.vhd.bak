@@ -92,7 +92,8 @@ architecture rtl of processor is
   signal regWriteAUX, branchAUX, JumpAUX, MemToRegAUX, MemWriteAUX, MemReadAUX, AluSrcAUX, RegDstAUX : std_logic ;
   
 --Señal para el PC
-  signal PCres,PCAUX : std_logic_vector(31 downto 0);
+  signal PCAUX : std_logic_vector(31 downto 0);
+  signal s1, s2 : std_logic_vector(31 downto 0);	--Salidas de los multiplexores de las distintas opciones del pc
   signal extSigno : std_logic_vector(31 downto 0);   --Señal para la extension de signo del dato inmediato en el branch
 
 begin   
@@ -114,24 +115,23 @@ begin
 			extSigno <= "0000000000000000" & IDataIn(15 downto 0)  when '0',	     
 						"1111111111111111" & IDataIn(15 downto 0)  when others;
 
-  process(JumpAUX,branchAUX,ZAUX)
-	begin
-  		if JumpAUX = '1' then							-- Si hay un jump, la direccion es la dada por la instruccion
-    			PCres <= PCAUX(31 downto 28) & IDataIn(25 downto 0) & "00";
 
-  		elsif (branchAUX = '1') and (ZAUX = '1') then					--Si hay un branch,la direccion es la suma del PC + 4 con el dato dado
-			PCres <= (extSigno(29 downto 0) & "00") + (PCAUX + 4);
-  
-  		else PCres <= PCAUX + 4;
-  		end if;
-	end process;
+  with (branchAUX and ZAUX) select						--Si hay un branch,la direccion es la suma del PC + 4 con el dato dado
+			s1 <= (extSigno(29 downto 0) & "00") + (PCAUX + 4) when '1',
+				PCAUX + 4 when others;
 
-  process(Clk,Reset)
+  with JumpAUX select							-- Si hay un jump, la direccion es la dada por la instruccion
+    			s2 <= PCAUX(31 downto 28) & IDataIn(25 downto 0) & "00"when '1',
+				s1 when others;
+
+  		
+
+  process(Clk,Reset)						--Proceso para  la implementacion del PC, con el reset activo a nivel alto
 	begin
 		if Reset = '1' then
 			PCAUX <= "00000000000000000000000000000000";
 		elsif rising_edge(Clk) then 
-			PCAUX <= PCres;
+			PCAUX <= s2;
 		end if;
 	end process;
 
@@ -146,33 +146,22 @@ begin
 
  --Implementamos el multiplexor del banco de registros
 
-  process(RegDstAUX)
-	begin
-  		if RegDstAUX = '0' then
-			regMux <= IDataIn(20 downto 16);
-  		else regMux <= IDataIn(15 downto 11);
-  		end if;
-  	end process;
-
+  with RegDstAUX select
+	regMux <= IDataIn(20 downto 16) when '0',
+	 	IDataIn(15 downto 11) when others;		
+  		
  --Implementamos el multiplexor de la ALU
   
-  process(ALUSrcAUX)
-	begin
-  		if ALUSrcAUX = '0' then
-			aluMux <= rd2AUX;
- 		else aluMux <= extSigno;
-  		end if;
-	end process;
- 
+  with ALUSrcAUX select
+	aluMux <= rd2AUX when '0',	
+		aluMux <= extSigno when others;
+ 	 
  --Implementamos el multiplexor de los datos a escribir en el banco de registros
  
- process(MemToRegAUX)
-	begin
-		if MemToRegAUX = '1' then
-			writedAUX = DDataIn;
-		else writedAUX = aluOut;
-		end if;
-	end process;
-
+  with MemToRegAUX select
+	writedAUX <= DDataIn when '1',
+		writedAUX <= aluOut when others;
+			
+		
 
 end architecture;

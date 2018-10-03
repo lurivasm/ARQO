@@ -1,14 +1,4 @@
-C:/Users/DANIEL/Documents/UAM/Tercero/ARQO/ARQO-master/arq0_p1/rtl/control_unit.vhd {1 {vcom -work work -2002 -explicit -stats=none C:/Users/DANIEL/Documents/UAM/Tercero/ARQO/ARQO-master/arq0_p1/rtl/control_unit.vhd
-Model Technology ModelSim PE Student Edition vcom 10.4a Compiler 2015.03 Apr  7 2015
--- Loading package STANDARD
--- Loading package TEXTIO
--- Loading package std_logic_1164
--- Loading package std_logic_arith
--- Loading package STD_LOGIC_UNSIGNED
--- Compiling entity control_unit
--- Compiling architecture rtl of control_unit
-
-} {} {}} C:/Users/DANIEL/Documents/UAM/Tercero/ARQO/ARQO-master/arq0_p1/sim/memory.vhd {1 {vcom -work work -2002 -explicit -stats=none C:/Users/DANIEL/Documents/UAM/Tercero/ARQO/ARQO-master/arq0_p1/sim/memory.vhd
+C:/Users/DANIEL/Documents/UAM/Tercero/ARQO/ARQO-master/arq0_p1/sim/memory.vhd {1 {vcom -work work -2002 -explicit -stats=none C:/Users/DANIEL/Documents/UAM/Tercero/ARQO/ARQO-master/arq0_p1/sim/memory.vhd
 Model Technology ModelSim PE Student Edition vcom 10.4a Compiler 2015.03 Apr  7 2015
 -- Loading package STANDARD
 -- Loading package TEXTIO
