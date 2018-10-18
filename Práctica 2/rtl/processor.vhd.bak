@@ -276,7 +276,7 @@ process(Clk,Reset)
 end process; 
 
 --Unidad de detección de riesgos 
-process(MemRead2,Irt2,Inst1)
+process(MemRead2,Irt2,Inst1,Irt2)
   begin
     if ((MemRead2 = '1') and ((Irt2 = Inst1(25 downto 21) or (Irt2 = Inst1(15 downto 11))))) then 
       PCWrite <= '0';

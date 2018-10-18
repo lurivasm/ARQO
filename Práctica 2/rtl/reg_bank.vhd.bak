@@ -65,7 +65,7 @@ begin
         Rd1 <= regs(conv_integer(A1));
       end if;  
       
-      if(A2 = A3) then
+      if(A2 = A3)
         Rd2 <= Wd3;
       else
         Rd2 <= regs(conv_integer(A2));
