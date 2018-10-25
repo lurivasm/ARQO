@@ -147,6 +147,9 @@ process(Clk,Reset,Write1)
 		elsif (Write1 = '1') and rising_edge(Clk) then 
 			PC4_1 <= PCAUX +4;
 			Inst1 <= IDataIn;
+		else 
+		  PC4_1 <= PC4_1;
+			Inst1 <= Inst1;
 		end if;
 	end process;
 
@@ -230,7 +233,7 @@ process(Clk,Reset)
 			MemWrite3 <= MemWrite2;
 			zero3 <= ZAUX;
 			BranchAdd3 <= (sigext2(29 downto 0) & "00") + PC4_2;
-			R2_3 <= R2_2;
+			R2_3 <= muxB;
 			R3_3 <= regMux;
 			aluout3 <= aluOut;
 		end if;
@@ -260,19 +263,20 @@ process(Clk,Reset)
 	  begin 
 	     if ((RegWrite3 = '1') and (R3_3 /= 0) and (R3_3 = Irs2)) then
 	       AnticiparA <= "10";
-	     end if;
+	     elsif ((RegWrite4 = '1') and (R3_4 /= 0) and (R3_4 = Irs2)) then
+         AnticiparA <= "01"; 
+       else 
+        AnticiparA <= "00"; 
+       end if;
 	     
 	     if ((RegWrite3 = '1') and (R3_3 /= 0) and (R3_3 = Irt2)) then
          AnticiparB <= "10"; 
-       end if;
-      
-       if ((RegWrite4 = '1') and (R3_4 /= 0) and (R3_4 = Irs2)) then
-         AnticiparA <= "01"; 
-       end if;
-        
-       if ((RegWrite4 = '1') and (R3_4 /= 0) and (R3_4 = Irt2)) then
+       elsif ((RegWrite4 = '1') and (R3_4 /= 0) and (R3_4 = Irt2)) then
          AnticiparB <= "01"; 
-       end if;
+       else 
+        AnticiparB <= "00";
+       end if;       
+       
 end process; 
 
 --Unidad de detección de riesgos 
@@ -312,6 +316,8 @@ end process;
 			PCAUX <= "00000000000000000000000000000000";
 		elsif (PCWrite = '1') and rising_edge(Clk) then 
 			PCAUX <= s2;
+		else 
+		  PCAUX <= PCAUX;
 		end if;
 	end process;
 
