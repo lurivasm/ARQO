@@ -4,8 +4,8 @@
 -- Asignatura: Arquitectura
 -- Grupo de Prácticas: 1312
 -- Grupo de Teoría: 310
--- Práctica: 2
--- Ejercicios: 1 y 2
+-- Práctica: 1
+-- Ejercicio: 1
 ----------------------------------------------------------------------
 
 library ieee;

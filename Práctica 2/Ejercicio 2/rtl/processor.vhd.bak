@@ -297,7 +297,7 @@ end process;
 
 --Implementamos las mejoras para el branch
   with (Branch3 and zero3) select
-    ResetBr <= '1' when '1'
+    ResetBr <= '1' when '1',
       '0' when others;
   
   --Implementamos el PC, con sus posibles salidas

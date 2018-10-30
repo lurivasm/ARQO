@@ -280,8 +280,10 @@ process(Clk,Reset)
 end process; 
 
 --Unidad de detección de riesgos 
-    nopcreator <= '1' when (MemRead2 = '1') and ((Irt2 = Inst1(25 downto 21)) or (Irt2 = Inst1(20 downto 16))) else '0';
-    PCWrite <= '0';
+process(MemRead2,Irt2,Inst1)
+  begin
+    if ((MemRead2 = '1') and ((Irt2 = Inst1(25 downto 21)) or (Irt2 = Inst1(20 downto 16)))) then 
+      PCWrite <= '0';
       Write1 <= '0';
       nopcreator <= '1';
    else 
