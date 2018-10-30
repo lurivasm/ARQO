@@ -4,7 +4,7 @@
 -- Asignatura: Arquitectura
 -- Grupo de Prácticas:1312
 -- Grupo de Teoría: 310
--- Práctica: 2
+-- Práctica: 1
 -- Ejercicio: 2
 ----------------------------------------------------------------------
 
@@ -123,6 +123,8 @@ architecture rtl of processor is
 --Señales para la unidad de detención de Riesgos
   signal nopcreator : std_logic;    --Señal que determina cuando hay que generar una burbuja en el procesador
 
+--Señales para el correcto funcionamiento del branch
+  signal ResetBr : std_logic; 
 
 begin   
   u1 : alu port map (OpA => muxA, OpB => aluMux , Control => AluControl2,
@@ -141,7 +143,7 @@ begin
 --Registro IF/ID
 process(Clk,Reset,Write1)
 	begin
-		if Reset = '1' then
+		if (Reset = '1') or (ResetBr = '1' and rising_edge(Clk)) then
 			PC4_1 <= "00000000000000000000000000000000";
 			Inst1 <= "00000000000000000000000000000000";
 		elsif (Write1 = '1') and rising_edge(Clk) then 
@@ -156,7 +158,7 @@ process(Clk,Reset,Write1)
 --Registro ID/EX
 process(Clk,Reset,nopcreator)
 	begin
-		if Reset = '1' then
+		if (Reset = '1') or (ResetBr = '1' and rising_edge(Clk)) then
 			RegWrite2 <= '0';
 			MemToReg2 <= '0';
 			Branch2 <= '0';
@@ -213,7 +215,7 @@ process(Clk,Reset,nopcreator)
 
 process(Clk,Reset)
 	begin
-		if Reset = '1' then
+		if (Reset = '1') or (ResetBr = '1' and rising_edge(Clk)) then
 			RegWrite3 <= '0';
 			MemToReg3 <= '0';
 			Branch3 <= '0';
@@ -293,7 +295,11 @@ process(MemRead2,Irt2,Inst1)
   end if;
 end process;
 
-
+--Implementamos las mejoras para el branch
+  with (Branch3 and zero3) select
+    ResetBr <= '1' when '1',
+      '0' when others;
+  
   --Implementamos el PC, con sus posibles salidas
 
   with Inst1(15) select												--Hacemos la extension de signo, utilizada en el branch y en instruciiones con dato inmediato  
