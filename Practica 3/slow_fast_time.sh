@@ -1,32 +1,57 @@
 #!/bin/bash
 
 # inicializar variables
-Ninicio=100
-Npaso=16
-Nfinal=$((Ninicio + 100))
+Ninicio=14096
+Npaso=64
+Nfinal=15120
 fDAT=slow_fast_time.dat
 fPNG=slow_fast_time.png
+declare -a sumaslow
+declare -a sumafast
+declare -i cont
 
 # borrar el fichero DAT y el fichero PNG
-rm -f $fDAT fPNG
+rm -f $fDAT $fPNG
+
+#llenamos los arrays de 0
+cont=0
+for ((N = Ninicio ; N <= Nfinal ; N += Npaso)); do
+	sumaslow[$cont]=0
+	sumafast[$cont]=0
+	((cont++))
+done
 
 # generar el fichero DAT vacío
 touch $fDAT
 
 echo "Running slow and fast..."
-# bucle para N desde P hasta Q
-#for N in $(seq $Ninicio $Npaso $Nfinal);
+#bucle para repetir varias veces la ejecución de slow y fast para todos los N
+for ((i = 0 ; i < $1 ; i++)); do
+	cont=0
+	for ((N = Ninicio ; N <= Nfinal ; N += Npaso)); do
+		echo "N($i): $N / $Nfinal..."
+
+		# ejecutar los programas slow y fast consecutivamente con tamaño de matriz N
+		# para cada uno, filtrar la línea que contiene el tiempo y seleccionar la
+		# tercera columna (el valor del tiempo). Dejar los valores en variables
+		# para poder imprimirlos" en la misma línea del fichero de datos
+		slowTime=$(./slow $N | grep 'time' | awk '{print $3}')
+		fastTime=$(./fast $N | grep 'time' | awk '{print $3}')
+		sumaslow[$cont]=$(echo "scale=10;((${sumaslow[$cont]}+$slowTime))"|bc)
+		sumafast[$cont]=$(echo "scale=10;((${sumaslow[$cont]}+$fastTime))"|bc)
+		((cont++))
+	done
+	#echo ${sumaslow[@]}
+	#echo ${sumafast[@]}
+done
+
+#escribimos los resultados en el .dat
+cont=0
 for ((N = Ninicio ; N <= Nfinal ; N += Npaso)); do
-	echo "N: $N / $Nfinal..."
-
-	# ejecutar los programas slow y fast consecutivamente con tamaño de matriz N
-	# para cada uno, filtrar la línea que contiene el tiempo y seleccionar la
-	# tercera columna (el valor del tiempo). Dejar los valores en variables
-	# para poder imprimirlos en la misma línea del fichero de datos
-	slowTime=$(./slow $N | grep 'time' | awk '{print $3}')
-	fastTime=$(./fast $N | grep 'time' | awk '{print $3}')
-
-	echo "$N	$slowTime	$fastTime" >> $fDAT
+	mediaslow=$(echo "scale=10;${sumaslow[$cont]}/$1"|bc)
+	mediafast=$(echo "scale=10;${sumafast[$cont]}/$1"|bc)
+	((cont++))
+	echo $N $mediaslow $mediafast >>$fDAT
 done
 
 echo "Generating plot..."
