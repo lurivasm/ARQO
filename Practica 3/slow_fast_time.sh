@@ -38,7 +38,7 @@ for ((i = 0 ; i < $1 ; i++)); do
 		slowTime=$(./slow $N | grep 'time' | awk '{print $3}')
 		fastTime=$(./fast $N | grep 'time' | awk '{print $3}')
 		sumaslow[$cont]=$(echo "scale=10;((${sumaslow[$cont]}+$slowTime))"|bc)
-		sumafast[$cont]=$(echo "scale=10;((${sumaslow[$cont]}+$fastTime))"|bc)
+		sumafast[$cont]=$(echo "scale=10;((${sumafast[$cont]}+$fastTime))"|bc)
 		((cont++))
 	done
 	#echo ${sumaslow[@]}
