@@ -8,13 +8,13 @@ rpng=cache_lectura.png
 wpng=cache_escritura.png
 tamCache=(1024 2048 4096 8192)
 contador=0
-D1mr_slow=()
-D1mw_slow=()
-D1mr_fast=()
-D1mw_fast=()
+declare -a D1mr_slow
+declare -a D1mw_slow
+declare -a D1mr_fast
+declare -a D1mw_fast
 
 # borrar el fichero DAT y el fichero PNG
-rm -f slow_cachegrind.dat fast_cachegrind.dat $rpng wpng
+rm -f $rpng wpng
 
 # Establecemos los valores para la cache de ultimo nivel
 # Size, associative, line size (bytes)
@@ -43,9 +43,9 @@ do
 
       D1mr_fast[contador]=$(cg_annotate fast_cachegrind.dat | head -n 22 | grep 'PROGRAM TOTALS' | awk '{print $5}')
       D1mw_fast[contador]=$(cg_annotate fast_cachegrind.dat | head -n 22 | grep 'PROGRAM TOTALS' | awk '{print $8}')
-      contador ++
+      ((contador++))
 
-   	echo "$N $D1mr $D1mw $D1mr $D1mw" >> cache_${tamCache[i]}.dat
+   	echo "$N ${D1mr_slow[$contador]} ${D1mw_slow[$contador]} ${D1mr_fast[$contador]} ${D1mw_fast[$contador]}" >> cache_${tamCache[i]}.dat
 
    done
 
@@ -55,15 +55,17 @@ done
 echo "Generating plot..."
 
 gnuplot << END_GNUPLOT
-set title "Slow-Fast Execution Time"
-set ylabel "Execution time (s)"
-set xlabel "Matrix Size"
+set title "Fallos de lectura"
+set ylabel "Fallos de Caché"
+set xlabel "Tamaño de Caché"
 set key right bottom
 set grid
 set term png
-set output "$fPNG"
-plot "$fDAT" using 1:2 with lines lw 2 title "slow", \
+set output "$rpng"
+plot "cache_1024" using 1:2 with lines lw 2 title "slow", \
      "$fDAT" using 1:3 with lines lw 2 title "fast"
 replot
 quit
 END_GNUPLOT
+
+rm -f slow_cachegrind.dat fast_cachegrind.dat

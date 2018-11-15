@@ -1,10 +1,10 @@
-LIBS = 
-LIB_DIR =  
+LIBS =
+LIB_DIR =
 FLAGS = -g -Wall -D_GNU_SOURCE
 
 .PHONY: clean all
 
-all: fast slow
+all: fast slow ej3_multiplica ej3_transpuesta
 
 fast: fast.c arqo3.c
 	gcc $(FLAGS) $(LIB_DIR) -o $@ $^ $(LIBS)
@@ -12,5 +12,11 @@ fast: fast.c arqo3.c
 slow: slow.c arqo3.c
 	gcc $(FLAGS) $(LIB_DIR) -o $@ $^ $(LIBS)
 
+ej3_multiplica: ej3_multiplica.c arqo3.c
+	gcc $(FLAGS) $(LIB_DIR) -o $@ $^ $(LIBS)
+
+ej3_transpuesta: ej3_transpuesta.c arqo3.c
+	gcc $(FLAGS) $(LIB_DIR) -o $@ $^ $(LIBS)
+
 clean:
-	rm -f *.o *~ fast slow
+	rm -f *.o *~ fast slow ejercicio3
