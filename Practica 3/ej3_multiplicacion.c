@@ -4,7 +4,7 @@
 #define ERROR 1
 #define OK 0
 
-tipo **multiplica(int n, tipo **m1, tipo **m2);
+tipo **multiplica(int n, tipo **m1, tipo **m2, tipo** resultado);
 
 int main(int argc, char **argv){
   /*Comprobamos los parámetros*/
@@ -30,9 +30,17 @@ int main(int argc, char **argv){
     exit(ERROR);
   }
 
+  resultado = generateEmptyMatrix(n);
+  if(!resultado){
+    printf("Error resultado\n");
+    freeMatrix(matrix1);
+    freeMatrix(matrix2);
+    exit(ERROR);
+  }
+
   gettimeofday(&ini, NULL);
 	/* Main computation */
-	resultado = multiplica(n, matrix1, matrix2);
+	resultado = multiplica(n, matrix1, matrix2,resultado);
 	/* End of computation */
   gettimeofday(&fin, NULL);
 
@@ -52,12 +60,8 @@ int main(int argc, char **argv){
 /**
 * Función que multiplica dos matrices, m1 y m2 de tamaño nxn
 */
-tipo **multiplica(int n, tipo **m1, tipo **m2){
-  tipo ** resultado;
+tipo **multiplica(int n, tipo **m1, tipo **m2, tipo **resultado){
   int i, j, k, aux;
-
-  resultado = generateEmptyMatrix(n);
-  if(!resultado)  return NULL;
 
   for(i = 0; i < n; i++){
     for(j = 0; j < n; j++){

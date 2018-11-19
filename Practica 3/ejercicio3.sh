@@ -10,6 +10,7 @@ declare -a D1mw_mult
 declare -a D1mr_tras
 declare -a D1mw_tras
 
+rm -f mult.dat
 
 echo "Ejercicio 3 : Running mult and tras..."
 # bucle que varia el tamaño de la matriz desde 256+256*4 hasta 256+256*5
@@ -25,8 +26,8 @@ do
   D1mw_mult[$contador]=$(cg_annotate mult_cachegrind.dat | head -n 22 | grep 'PROGRAM TOTALS' | awk '{print $8}'|sed -e 's/,//g')
   time_mult[$contador]=$(./ej3_multiplicacion $N | grep 'time' | awk '{print $3}')
 
-  D1mr_tras[$contador]=$(cg_annotate tras_cachegrind.dat | head -n 22 | grep 'PROGRAM TOTALS' | awk '{print $5}')
-  D1mw_tras[$contador]=$(cg_annotate tras_cachegrind.dat | head -n 22 | grep 'PROGRAM TOTALS' | awk '{print $8}')
+  D1mr_tras[$contador]=$(cg_annotate tras_cachegrind.dat | head -n 22 | grep 'PROGRAM TOTALS' | awk '{print $5}'|sed -e 's/,//g')
+  D1mw_tras[$contador]=$(cg_annotate tras_cachegrind.dat | head -n 22 | grep 'PROGRAM TOTALS' | awk '{print $8}'|sed -e 's/,//g')
   time_tras[$contador]=$(./ej3_transpuesta $N | grep 'time' | awk '{print $3}')
 
   echo $N ${time_mult[$contador]} ${D1mr_mult[$contador]} ${D1mw_mult[$contador]} ${time_tras[$contador]} ${D1mr_tras[$contador]} ${D1mw_tras[$contador]} >> mult.dat
