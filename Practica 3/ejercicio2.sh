@@ -33,8 +33,7 @@ do
       valgrind --tool=cachegrind --LL=8388608,1,64 --I1=${tamCache[$i]},1,64 --D1=${tamCache[$i]},1,64 --cachegrind-out-file=fast_cachegrind.dat ./fast $N
 
       D1mr_slow[$contador]=$(cg_annotate slow_cachegrind.dat | head -n 22 | grep 'PROGRAM TOTALS' | awk '{print $5}'| sed -e 's/,//g')
-			echo "coso"${D1mr_slow[$contador]}
-      D1mw_slow[$contador]=$(cg_annotate slow_cachegrind.dat | head -n 22 | grep 'PROGRAM TOTALS' | awk '{print $8}'| sed -e 's/,//g')
+		  D1mw_slow[$contador]=$(cg_annotate slow_cachegrind.dat | head -n 22 | grep 'PROGRAM TOTALS' | awk '{print $8}'| sed -e 's/,//g')
 
       D1mr_fast[$contador]=$(cg_annotate fast_cachegrind.dat | head -n 22 | grep 'PROGRAM TOTALS' | awk '{print $5}'| sed -e 's/,//g')
       D1mw_fast[$contador]=$(cg_annotate fast_cachegrind.dat | head -n 22 | grep 'PROGRAM TOTALS' | awk '{print $8}'| sed -e 's/,//g')
@@ -54,7 +53,7 @@ gnuplot << END_GNUPLOT
 set title "Fallos de lectura"
 set ylabel "Fallos de Caché"
 set xlabel "Tamaño de Matriz"
-set key right bottom
+set key outside
 set grid
 set term png
 set output "$rpng"

@@ -1,8 +1,10 @@
 
-#include "arqo.h"
+#include "arqo3.h"
 
 #define ERROR 1
 #define OK 0
+
+tipo **multiplica(int n, tipo **m1, tipo **m2);
 
 int main(int argc, char **argv){
   /*Comprobamos los parámetros*/
