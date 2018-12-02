@@ -6,15 +6,22 @@
 #include <stdlib.h>
 #include "arqo4.h"
 
-int main(void)
+int main(int argc, char **argv)
 {
+
+	if(argc < 2){
+		printf("Error en los argumentos de entrada\n");
+		return 1;
+	}
+
 	float *A=NULL, *B=NULL;
 	long long k=0;
 	struct timeval fin,ini;
 	float sum=0;
-	
-	A = generateVector(M);
-	B = generateVector(M);
+	unsigned long long P;
+	P = atoll(argv[1]);
+	A = generateVector(P);
+	B = generateVector(P);
 	if ( !A || !B )
 	{
 		printf("Error when allocationg matrix\n");
@@ -22,7 +29,6 @@ int main(void)
 		freeVector(B);
 		return -1;
 	}
-	
 	gettimeofday(&ini,NULL);
 	/* Bloque de computo */
 	sum = 0;

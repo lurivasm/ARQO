@@ -3,17 +3,27 @@
 //
 #include <stdio.h>
 #include <stdlib.h>
+#include <omp.h>
 #include "arqo4.h"
 
-int main(void)
+int main(int argc, char **argv)
 {
+
+	if(argc < 3){
+		printf("Error en los argumentos de entrada\n");
+		return 1;
+	}
+
 	float *A=NULL, *B=NULL;
 	long long k=0;
 	struct timeval fin,ini;
 	float sum=0;
-	
-	A = generateVector(M);
-	B = generateVector(M);
+
+	unsigned long long P;
+	P = atoll(argv[1]);
+	A = generateVector(P);
+	B = generateVector(P);
+
 	if ( !A || !B )
 	{
 		printf("Error when allocationg matrix\n");
@@ -21,7 +31,7 @@ int main(void)
 		freeVector(B);
 		return -1;
 	}
-	
+	omp_set_num_threads(atoi(argv[2]));
 	gettimeofday(&ini,NULL);
 	/* Bloque de computo */
 	sum = 0;
