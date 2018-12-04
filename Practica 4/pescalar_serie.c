@@ -15,10 +15,9 @@ int main(int argc, char **argv)
 	}
 
 	float *A=NULL, *B=NULL;
-	long long k=0;
+	long long k=0, P;
 	struct timeval fin,ini;
 	float sum=0;
-	unsigned long long P;
 	P = atoll(argv[1]);
 	A = generateVector(P);
 	B = generateVector(P);
@@ -32,7 +31,7 @@ int main(int argc, char **argv)
 	gettimeofday(&ini,NULL);
 	/* Bloque de computo */
 	sum = 0;
-	for(k=0;k<M;k++)
+	for(k=0;k<atoi(argv[1]);k++)
 	{
 		sum = sum + A[k]*B[k];
 	}
