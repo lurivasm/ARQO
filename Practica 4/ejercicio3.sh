@@ -11,6 +11,7 @@ fSerie=seriemult.dat
 fPar=paralmult.dat
 fAcc=Accmult.dat
 
+rm -f $fSerie $fPar $fAcc
 echo "Tomando datos..."
 
 for ((i = NInicio ; i <= NFin ; i+=NPaso)); do
@@ -18,7 +19,7 @@ for ((i = NInicio ; i <= NFin ; i+=NPaso)); do
     t=$(./multiplicacion_serie $i | grep 'time' | awk '{print $3}')
     serie=$(echo "scale=10;(($serie+$t))"|bc)
     t=$(./multiplicacion_paral $i $hilos $bucle | grep 'time' | awk '{print $3}')
-    par=$(echo "scale=10;(($par}+$t))"|bc)
+    par=$(echo "scale=10;(($par+$t))"|bc)
   done
 
   serie=$(echo "scale=10;$serie/5"|bc)
