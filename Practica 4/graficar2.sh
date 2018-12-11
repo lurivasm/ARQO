@@ -25,7 +25,7 @@ END_GNUPLOT
 
 echo "Generating plot..."
 gnuplot << END_GNUPLOT
-set title "Tiempo de ejecucion(hilos 9 - 12)"
+set title "Tiempo de ejecucion(hilos 9 - 16)"
 set ylabel "Tiempo(s)"
 set xlabel "Tamaño de Vector"
 set key outside
@@ -48,13 +48,13 @@ END_GNUPLOT
 
 echo "Generating plot..."
 gnuplot << END_GNUPLOT
-set title "Aceleración"
+set title "Aceleración(Hilos 1 - 8)"
 set ylabel "Aceleración"
 set xlabel "Tamaño de Vector"
 set key outside
 set grid
 set term png
-set output "pescalar_aceleracion.png"
+set output "pescalar_aceleracion1.png"
 plot "Acc1.dat" using 1:2 with lines lw 2 title "1 hilo", \
      "Acc2.dat" using 1:2 with lines lw 2 title "2 hilos", \
      "Acc3.dat" using 1:2 with lines lw 2 title "3 hilos", \
@@ -62,15 +62,30 @@ plot "Acc1.dat" using 1:2 with lines lw 2 title "1 hilo", \
 		 "Acc5.dat" using 1:2 with lines lw 2 title "5 hilos", \
 		 "Acc6.dat" using 1:2 with lines lw 2 title "6 hilos", \
 		 "Acc7.dat" using 1:2 with lines lw 2 title "7 hilos", \
-		 "Acc8.dat" using 1:2 with lines lw 2 title "8 hilos", \
-		 "Acc9.dat" using 1:2 with lines lw 2 title "9 hilos", \
-		 "Acc10.dat" using 1:2 with lines lw 2 title "10 hilos", \
-		 "Acc11.dat" using 1:2 with lines lw 2 title "11 hilos", \
-		 "Acc12.dat" using 1:2 with lines lw 2 title "12 hilos", \
-		 "Acc13.dat" using 1:2 with lines lw 2 title "13 hilos", \
-		 "Acc14.dat" using 1:2 with lines lw 2 title "14 hilos", \
-		 "Acc15.dat" using 1:2 with lines lw 2 title "15 hilos", \
-		 "Acc16.dat" using 1:2 with lines lw 2 title "16 hilos"
+		 "Acc8.dat" using 1:2 with lines lw 2 title "8 hilos"
+replot
+quit
+END_GNUPLOT
+
+
+
+echo "Generating plot..."
+gnuplot << END_GNUPLOT
+set title "Aceleración(Hilos 9 - 16)"
+set ylabel "Aceleración"
+set xlabel "Tamaño de Vector"
+set key outside
+set grid
+set term png
+set output "pescalar_aceleracion2.png"
+plot "Acc10.dat" using 1:2 with lines lw 2 title "10 hilos", \
+     "Acc11.dat" using 1:2 with lines lw 2 title "11 hilos", \
+     "Acc12.dat" using 1:2 with lines lw 2 title "12 hilos", \
+     "Acc13.dat" using 1:2 with lines lw 2 title "13 hilos", \
+     "Acc14.dat" using 1:2 with lines lw 2 title "14 hilos", \
+     "Acc15.dat" using 1:2 with lines lw 2 title "15 hilos", \
+     "Acc16.dat" using 1:2 with lines lw 2 title "16 hilos"
+
 replot
 quit
 END_GNUPLOT
