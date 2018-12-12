@@ -1,5 +1,5 @@
 /*********************************************************/
-/* Cálculo PI: Método de integración - Version OpenMP	 */
+/* Cï¿½lculo PI: Mï¿½todo de integraciï¿½n - Version OpenMP	 */
 /* false sharing 					 */
 /*********************************************************/
 
@@ -9,8 +9,13 @@
 #include <unistd.h>
 #include <omp.h>
 
-int main( int argc, char *argv[] ) 
+int main( int argc, char *argv[] )
 {
+
+	if(argc < 2){
+		printf("Error\n");
+		return 1;
+	}
 	int i, n = 100000000, numProcs, numThreads;
 	int datasz, linesz, padsz;
 	double h, pi, *sum = NULL,t = 0;
@@ -29,11 +34,12 @@ int main( int argc, char *argv[] )
 	fgets(buf, sizeof(buf), f);
 	pclose(f);
 	linesz = atoi(buf);
-	padsz = linesz / datasz;
+	//padsz = linesz / datasz;
+	padsz = atoi(argv[1]);
 	printf("Cache line size: %d bytes => padding: %d elementos\n", linesz, padsz);
-	
+
 	// Solicitamos memoria para la suma de cada proceso
-	sum = (double*) malloc (sizeof(double)*numProcs*padsz);	
+	sum = (double*) malloc (sizeof(double)*numProcs*padsz);
 
 	gettimeofday(&t1,NULL);
 
@@ -42,28 +48,28 @@ int main( int argc, char *argv[] )
 	{
 		double x;
 		int i, tid;
-	
-		// Obtenemos el numero de procesos lanzados	
+
+		// Obtenemos el numero de procesos lanzados
                 numThreads = omp_get_num_threads();
-	
+
 		// Obtenemos nuestro identificador de thread
 		tid = omp_get_thread_num();
-	
+
 		sum[tid*padsz] = 0.0;
-		for(i = tid + 1; i <= n; i += numThreads) 
+		for(i = tid + 1; i <= n; i += numThreads)
 		{
 			x = h * ((double) i - 0.5);
 			sum[tid*padsz] += 4.0 / (1.0 + x*x);
 		}
 	}
-	
+
 	pi = 0.0;
 	for(i = 0; i < numProcs; i++)
 		pi += sum[i*padsz];
 	pi = h * pi;
-	
+
 	gettimeofday(&t2,NULL);
-	
+
 	t = (t2.tv_sec -t1.tv_sec) + (t2.tv_usec - t1.tv_usec)/(double)1000000;
 	printf("Resultado pi: %f\nTiempo %lf\n", pi, t);
 
